@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Sistema Caixa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+    <link rel="stylesheet" href="assets/css/styles.min.css">
+</head>
+
+<body>
+    <nav class="navbar navbar-dark navbar-expand-md navigation-clean">
+        <div class="container"><a class="navbar-brand" data-bs-hover-animate="pulse" href="#">Caixa</a><button
+                data-toggle="collapse" class="navbar-toggler" data-target="#navcol-1"><span class="sr-only">Toggle
+                    navigation</span><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navcol-1">
+                <ul class="nav navbar-nav ml-auto">
+                    <li class="nav-item"><a class="nav-link active text-white" data-bs-hover-animate="pulse"
+                            href="#"><strong>Movimentos</strong></a></li>
+                            
+                    <li class="nav-item"><a class="nav-link text-white-50" data-bs-hover-animate="pulse"
+                            href="saldo.html">Saldo</a></li>
+                    <li class="nav-item"></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div style="margin-top: 30px;">
+        <div class="text-center">
+            <h3>MOVIMENTOS</h3>
+            <a type="button" class="btn btn-success" href="novoMovimento.html">Novo Movimento</a>
+        </div>
+        
+        <div
+            class="d-flex d-md-flex d-xl-flex justify-content-center justify-content-md-center justify-content-xl-center">
+            <div class="table-responsive text-center" style="max-width: 90%;">
+                <table class="table" id="tabela">
+                    <thead>
+                        <tr class="table-active">
+                            <th>ID</th>
+                            <th>DATA</th>
+                            <th>DESCRIÇÃO</th>
+                            <th>VALOR</th>
+                            <th>TIPO</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <!-- TABELA LISTANDO TODOS OS MOVIMENTOS -->
+                    </tbody>
+                </table>
+                <p class="text-right mr-5" id="saldo-txt">
+                    SALDO: <b>R$ </b> 
+                </p>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/script.min.js"></script>
+    <script src="../TEST/getMov.js"></script>
+</body>
+
+</html>
