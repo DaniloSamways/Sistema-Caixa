@@ -36,9 +36,10 @@ app.get('/API/saldo', function (req, res) {
 })
 
 app.get('/API/saldo/verifica', function (req, res) {
+    
     saldo.findAll({
         where:{
-            data: "2022-02-24"
+            data: req.query.dataTime
         },
         attributes: ['id', 'data', 'valor']
     }).then(function (dados) {
@@ -70,9 +71,19 @@ app.post('/API/movimentos/cadastrar', function (req, res) {
         res.json({ "Success": false, "Message": err.message })
         console.log('false')
     })
-
-
 })
+
+app.get('/API/movimentos/testeCad', function (req, res) {
+    let dataTime = "2022-03-31"
+    cadSaldo.update({
+        valor: 10
+    },{
+        where: { data: dataTime }
+    })
+    
+    res.json(cadSaldo.findOne({ where: { data: "2022-03-31" } }))
+})
+
 app.post('/API/saldo/cadastrar', function (req, res) {
     const novoSaldo = cadSaldo.create({
         data: req.body.data,
@@ -85,6 +96,8 @@ app.post('/API/saldo/cadastrar', function (req, res) {
 
 
 })
+
+
 
 app.listen('3000', () => {
     console.log('Listening on http://localhost:3000');

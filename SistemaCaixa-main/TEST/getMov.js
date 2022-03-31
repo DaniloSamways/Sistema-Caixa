@@ -19,8 +19,7 @@ function criaLinha(movimento){
         tipo = "table-danger"
         saldo -= parseFloat(movimento.valor)
     }
-    
-    console.log(saldo)
+
 
     linha = document.createElement('tr')
     tdId = document.createElement('td')
