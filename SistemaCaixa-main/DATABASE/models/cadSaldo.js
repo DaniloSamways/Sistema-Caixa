@@ -9,7 +9,7 @@ const saldo = db.define('saldos', {
         primaryKey: true
     },
     data: {
-        type: Sequelize.DATE,
+        type: Sequelize.DataTypes.DATEONLY,
         allowNull: false
     },
     valor: {

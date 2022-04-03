@@ -6,8 +6,9 @@ var cadSaldo = require('../DATABASE/models/cadSaldo')
 var movimento = require('../DATABASE/models/movimentos');
 var cors = require('cors');
 var saldo = require('../DATABASE/models/saldo');
+var sequelize = require('sequelize');
 
-const { QueryTypes } = require('@sequelize/core');
+const { Op, QueryTypes } = require('@sequelize/core');
 const { type } = require('express/lib/response');
 
 app.use(express.json())
@@ -36,26 +37,26 @@ app.get('/API/saldo', function (req, res) {
 })
 
 app.get('/API/saldo/verifica', function (req, res) {
-    
+
     saldo.findAll({
-        where:{
+        where: {
             data: req.query.dataTime
         },
         attributes: ['id', 'data', 'valor']
     }).then(function (dados) {
 
         var dadosLen = JSON.stringify(dados).length;
-        if(dadosLen > 2){
+        if (dadosLen > 2) {
             res.json({ 'exists': true })
-        }else{
+        } else {
             res.json({ 'exists': false })
         }
 
 
     });
 
-    
-    
+
+
 });
 
 app.post('/API/movimentos/cadastrar', function (req, res) {
@@ -73,15 +74,25 @@ app.post('/API/movimentos/cadastrar', function (req, res) {
     })
 })
 
-app.get('/API/movimentos/testeCad', function (req, res) {
-    let dataTime = "2022-03-31"
+app.post('/API/movimentos/testeCad', function (req, res) {
+    let dataTime = req.body.data
+    let valorA = req.body.valor
+    let tipo = req.body.tipo
+    if (tipo == "E") {
+        tipo = '+'
+    } else {
+        tipo = '-'
+    }
     cadSaldo.update({
-        valor: 10
-    },{
-        where: { data: dataTime }
+        valor: sequelize.literal('valor ' + tipo + ' ' + valorA)
+    }, {
+        where: {
+            data: {
+                [Op.gte]: dataTime
+            }
+        }
     })
-    
-    res.json(cadSaldo.findOne({ where: { data: "2022-03-31" } }))
+
 })
 
 app.post('/API/saldo/cadastrar', function (req, res) {
