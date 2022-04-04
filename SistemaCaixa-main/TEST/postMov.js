@@ -36,9 +36,11 @@ function postMovimento(dataTime, descricao, valor, tipo) {
     var first; 
 
     if (consulta == false) {
+        first = true;
         console.log("NAO EXISTE | DATA: " + dataTime)
         postSaldos(dataTime, valor);
     } else {
+        first = false;
         console.log("EXISTE | DATA: " + dataTime)
     }
     
@@ -47,7 +49,7 @@ function postMovimento(dataTime, descricao, valor, tipo) {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ "data": dataTime, "valor": valor, "tipo": tipo})
+        body: JSON.stringify({ "data": dataTime, "valor": valor, "tipo": tipo, "first": first})
     };
     fetch('http://localhost:3000/API/movimentos/testeCad', options2)
 }

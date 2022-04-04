@@ -9,7 +9,7 @@ var saldo = require('../DATABASE/models/saldo');
 var sequelize = require('sequelize');
 
 const { Op, QueryTypes } = require('@sequelize/core');
-const { type } = require('express/lib/response');
+const { type, json } = require('express/lib/response');
 
 app.use(express.json())
 
@@ -59,11 +59,41 @@ app.get('/API/saldo/verifica', function (req, res) {
 
 });
 
-app.post('/API/movimentos/cadastrar', function (req, res) {
+app.get('/ultimoValor', async function (req, res) {
+    const ultimoSaldo = await cadSaldo.findOne({
+        attributes: ['valor'],
+        where: {
+            data: {
+                [Op.lt]: '2022-04-05'
+            }
+        },
+        raw: true
+    })
+    console.log(ultimoSaldo)
+    res.send(ultimoSaldo)
+})
+
+app.post('/API/movimentos/cadastrar', async function (req, res) {
+    const ultimoSaldo = await cadSaldo.findOne({
+        attributes: ['valor'],
+        where: {
+            data: {
+                [Op.lt]: req.body.data
+            }
+        },
+        raw: true
+    })
+    if(ultimoSaldo != null){
+        var valorUltimoSaldo = JSON.parse(JSON.stringify(saldo)).valor
+    }else{
+        valorUltimoSaldo = 0;
+    }
+    
+
     const novoMovimento = cadMovimento.create({
         data: req.body.data,
         descricao: req.body.descricao,
-        valor: req.body.valor,
+        valor: req.body.valor + valorUltimoSaldo,
         tipo: req.body.tipo
     }).then(() => {
         res.json({ "Success": true, "Message": "Movimento Cadastrado com Sucesso" })
@@ -78,20 +108,35 @@ app.post('/API/movimentos/testeCad', function (req, res) {
     let dataTime = req.body.data
     let valorA = req.body.valor
     let tipo = req.body.tipo
+    let first = req.body;
+
     if (tipo == "E") {
         tipo = '+'
     } else {
         tipo = '-'
     }
-    cadSaldo.update({
-        valor: sequelize.literal('valor ' + tipo + ' ' + valorA)
-    }, {
-        where: {
-            data: {
-                [Op.gte]: dataTime
+
+    if (first == true) {
+        cadSaldo.update({
+            valor: sequelize.literal('valor ' + tipo + ' ' + valorA)
+        }, {
+            where: {
+                data: {
+                    [Op.gt]: dataTime
+                }
             }
-        }
-    })
+        })
+    } else {
+        cadSaldo.update({
+            valor: sequelize.literal('valor ' + tipo + ' ' + valorA)
+        }, {
+            where: {
+                data: {
+                    [Op.gte]: dataTime
+                }
+            }
+        })
+    }
 
 })
 

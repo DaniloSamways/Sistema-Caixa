@@ -1,5 +1,5 @@
 var Sequelize = require('sequelize');
-var sequelize = new Sequelize("sistemacaixa", "root", "root", {
+var sequelize = new Sequelize("sistemacaixa", "root", "vertrigo", {
     host: 'localhost',
     dialect: 'mysql'
 });
