@@ -30,7 +30,10 @@
     <div style="margin-top: 30px;">
         <div class="text-center">
             <h3>MOVIMENTOS</h3>
-            <a class="btn btn-info" href="filtroMovimentos.html">Extrato</a><br><br>
+            <a>Data Inicial </a><input id="dataInicial" type="date"><br>
+            <a>Data Final </a><input id="dataFinal" type="date"><br><br>
+            <button type="button" onClick="filtrar()" class="btn btn-info">Filtrar</button><br><br>
+
             <a type="button" class="btn btn-success" href="novoMovimento.html">Novo Movimento</a>
         </div>
         
@@ -70,7 +73,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/script.min.js"></script>
-    <script src="../TEST/getMov.js"></script>
     <script src="../TEST/filtroMov.js"></script>
 </body>
 

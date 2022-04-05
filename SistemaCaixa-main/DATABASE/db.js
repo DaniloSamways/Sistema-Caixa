@@ -1,7 +1,8 @@
 var Sequelize = require('sequelize');
 var sequelize = new Sequelize("sistemacaixa", "root", "vertrigo", {
     host: 'localhost',
-    dialect: 'mysql'
+    dialect: 'mysql',
+    logging: false
 });
 
 try {

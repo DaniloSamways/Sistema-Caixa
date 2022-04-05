@@ -22,7 +22,30 @@ app.use((req, res, next) => {
 
 app.get('/API/movimentos', function (req, res) {
     movimento.findAll({
-        attributes: ['id', 'data', 'descricao', 'valor', 'tipo']
+        attributes: ['id', 'data', 'descricao', 'valor', 'tipo'],
+        order: [
+            ['data', 'ASC']
+        ]
+    }).then(function (dados) {
+        res.json(dados)
+    });
+});
+
+app.get('/API/movimentos/filtro', function (req, res) {
+    let dataInicial = req.query.dataInicial;
+    let dataFinal = req.query.dataFinal;
+
+    movimento.findAll({
+        attributes: ['id', 'data', 'descricao', 'valor', 'tipo'],
+        order: [
+            ['data', 'ASC']
+        ],
+        where: {
+            data: {
+                [Op.gte]: dataInicial,
+                [Op.lte]: dataFinal
+            }
+        }
     }).then(function (dados) {
         res.json(dados)
     });
@@ -30,13 +53,17 @@ app.get('/API/movimentos', function (req, res) {
 
 app.get('/API/saldo', function (req, res) {
     saldo.findAll({
-        attributes: ['id', 'data', 'valor']
+        attributes: ['id', 'data', 'valor'],
+        order: [
+            ['data', 'ASC']
+        ]
     }).then(function (dados) {
         res.json(dados)
     });
 })
 
 app.get('/API/saldo/verifica', function (req, res) {
+    console.log('- saldo/verifica')
 
     saldo.findAll({
         where: {
@@ -59,21 +86,19 @@ app.get('/API/saldo/verifica', function (req, res) {
 
 });
 
-app.get('/ultimoValor', async function (req, res) {
-    const ultimoSaldo = await cadSaldo.findOne({
-        attributes: ['valor'],
+app.get('/testeSaldo', async function (req, res) {
+    var existeSaldo = await cadSaldo.findOne({
         where: {
-            data: {
-                [Op.lt]: '2022-04-05'
-            }
-        },
-        raw: true
+            data: '04-04-2020'
+        }
     })
-    console.log(ultimoSaldo)
-    res.send(ultimoSaldo)
+    existeSaldo = JSON.stringify(existeSaldo).length;
+    res.json(existeSaldo);
 })
 
 app.post('/API/movimentos/cadastrar', async function (req, res) {
+    console.log('- movimentos/cadastrar')
+
     const ultimoSaldo = await cadSaldo.findOne({
         attributes: ['valor'],
         where: {
@@ -81,19 +106,53 @@ app.post('/API/movimentos/cadastrar', async function (req, res) {
                 [Op.lt]: req.body.data
             }
         },
-        raw: true
+        raw: true,
+        order: [
+            ['data', 'DESC']
+        ]
     })
-    if(ultimoSaldo != null){
-        var valorUltimoSaldo = JSON.parse(JSON.stringify(saldo)).valor
-    }else{
-        valorUltimoSaldo = 0;
+
+    var existeSaldo = await cadSaldo.findOne({
+        where: {
+            data: '04-04-2020'
+        }
+    })
+    existeSaldo = JSON.stringify(existeSaldo).length;
+    if(existeSaldo <= 4){
+        const novoSaldo = cadSaldo.create({
+            data: req.body.data,
+            //valor: req.body.valor + valorUltimoSaldo 
+            valor: sequelize.literal(valorUltimoSaldo + ' ' + tipo + ' ' + req.body.valor)
+        })
     }
+
+    let tipo = req.body.tipo;
+    if (tipo == "E") {
+        tipo = '+'
+    } else {
+        tipo = '-'
+    }
+
+    var valorUltimoSaldo;
+
+    if(ultimoSaldo == null){
+        valorUltimoSaldo = 0; // NAO EXISTE, ENTAO O VALOR É 0
+        console.log("NAO EXISTE SALDO")
+        
+    }else{ // EXISTE O SALDO
+        console.log(JSON.parse(JSON.stringify(ultimoSaldo)))
+        valorUltimoSaldo = JSON.parse(JSON.stringify(ultimoSaldo)).valor
+        console.log("EXISTE SALDO")
+    }
+    
+    console.log("Ultimo Saldo: "+valorUltimoSaldo+"\n Valor Req Body: "+req.body.valor)
+
     
 
     const novoMovimento = cadMovimento.create({
         data: req.body.data,
         descricao: req.body.descricao,
-        valor: req.body.valor + valorUltimoSaldo,
+        valor: req.body.valor,
         tipo: req.body.tipo
     }).then(() => {
         res.json({ "Success": true, "Message": "Movimento Cadastrado com Sucesso" })
@@ -102,13 +161,17 @@ app.post('/API/movimentos/cadastrar', async function (req, res) {
         res.json({ "Success": false, "Message": err.message })
         console.log('false')
     })
+
+    console.log("Novo Saldo Cadastro: "+valorUltimoSaldo+" "+tipo+" "+req.body.valor)
 })
 
 app.post('/API/movimentos/testeCad', function (req, res) {
+    console.log('- movimentos/TesteCad');
+
     let dataTime = req.body.data
     let valorA = req.body.valor
     let tipo = req.body.tipo
-    let first = req.body;
+    let first = req.body.first;
 
     if (tipo == "E") {
         tipo = '+'
@@ -117,6 +180,8 @@ app.post('/API/movimentos/testeCad', function (req, res) {
     }
 
     if (first == true) {
+        console.log("UPDATE ( > ) -> Valor: "+valorA+" | Tipo: "+tipo)
+
         cadSaldo.update({
             valor: sequelize.literal('valor ' + tipo + ' ' + valorA)
         }, {
@@ -127,6 +192,8 @@ app.post('/API/movimentos/testeCad', function (req, res) {
             }
         })
     } else {
+        console.log("UPDATE ( >= ) -> Valor: "+valorA+" | Tipo: "+tipo)
+
         cadSaldo.update({
             valor: sequelize.literal('valor ' + tipo + ' ' + valorA)
         }, {
@@ -137,19 +204,6 @@ app.post('/API/movimentos/testeCad', function (req, res) {
             }
         })
     }
-
-})
-
-app.post('/API/saldo/cadastrar', function (req, res) {
-    const novoSaldo = cadSaldo.create({
-        data: req.body.data,
-        valor: req.body.valor
-    }).then(() => {
-        res.json({ "Success": true, "Message": "Saldo Cadastrado com Sucesso" })
-    }).catch(err => {
-        res.json({ "Success": false, "Message": err.message })
-    })
-
 
 })
 
