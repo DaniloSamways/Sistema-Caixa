@@ -114,25 +114,16 @@ app.post('/API/movimentos/cadastrar', async function (req, res) {
 
     var existeSaldo = await cadSaldo.findOne({
         where: {
-            data: '04-04-2020'
+            data: req.body.data
         }
     })
     existeSaldo = JSON.stringify(existeSaldo).length;
-    if(existeSaldo <= 4){
-        const novoSaldo = cadSaldo.create({
-            data: req.body.data,
-            //valor: req.body.valor + valorUltimoSaldo 
-            valor: sequelize.literal(valorUltimoSaldo + ' ' + tipo + ' ' + req.body.valor)
-        })
-    }
-
     let tipo = req.body.tipo;
     if (tipo == "E") {
         tipo = '+'
     } else {
         tipo = '-'
     }
-
     var valorUltimoSaldo;
 
     if(ultimoSaldo == null){
@@ -144,6 +135,19 @@ app.post('/API/movimentos/cadastrar', async function (req, res) {
         valorUltimoSaldo = JSON.parse(JSON.stringify(ultimoSaldo)).valor
         console.log("EXISTE SALDO")
     }
+
+    if(existeSaldo <= 4){
+        console.log("--- NAO EXISTE SALDO")
+        const novoSaldo = cadSaldo.create({
+            data: req.body.data,
+            //valor: req.body.valor + valorUltimoSaldo 
+            valor: sequelize.literal(valorUltimoSaldo + ' ' + tipo + ' ' + req.body.valor)
+        })
+    }
+
+    
+
+    
     
     console.log("Ultimo Saldo: "+valorUltimoSaldo+"\n Valor Req Body: "+req.body.valor)
 
